@@ -1,5 +1,8 @@
 using Microsoft.EntityFrameworkCore;
+using ProjectCrud.BLL.Service;
 using ProjectCrud.DAL.DataContext;
+using ProjectCrud.DAL.Repositories;
+using ProjectCrud.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,6 +13,11 @@ builder.Services.AddDbContext<AspncapasContext>(op =>
 {
     op.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
+
+builder.Services.AddScoped<IGenericRepository<Contacto>,ContactRepository>();
+
+builder.Services.AddScoped<IContactoService, ContactoService>();
+
 
 
 
