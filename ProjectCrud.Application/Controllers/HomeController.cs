@@ -44,11 +44,7 @@ namespace ProjectCrud.Application.Controllers
         [HttpPost]
         public async Task<IActionResult> Save([FromBody] VModelContact contact)
         {
-            if(ModelState.IsValid)
-            {
-                return View(contact);
-            }
-
+           
             var contactModel = new Contacto()
             {
                 Nombre = contact.Nombre,

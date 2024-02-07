@@ -2,7 +2,132 @@
     ViewData["Title"] = "Home Page";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="row">
+    <div class="col-sm-12">
+
+        <div class="card">
+            <div class="card-header">Contactos</div>
+            <div class="body">
+                <button style="margin:10px;" class="btn btn-success"
+                id="btnNew">Nuevo</button>
+
+                <hr />
+
+                <table class="table table-stripped" id="tbContacto">
+                    <thead>
+                        <tr>
+                            <th>Nombre</th>
+                            <th>Teléfono</th>
+                            <th>Fecha Nac.</th>
+                            <th>Opciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
 </div>
+
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="exampleModalLabel">Detalle</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="txtIdContacto" value="0" />
+                <div class="mb-2">
+                    <label>Nombre</label>
+                    <input type="text" class="form-control" id="txtNombre" />
+                </div>
+                <div class="mb-2">
+                    <label>Teléfono</label>
+                    <input type="text" class="form-control" id="txtTelefono" />
+                </div>
+                <div class="mb-2">
+                    <label>Fecha de Nac.</label>
+                    <input type="text" class="form-control" id="txtFechaNacimiento" />
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn btn-primary" id="btnSave">Guardar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section Scripts {
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script>
+
+        const Modelo_base = {
+            idContacto: 0,
+            nombre: "",
+            telefono: "",
+            fechaNacimiento: ""
+        };
+
+        function seeModal(modelo) {
+            $("#txtIdContacto").val(modelo.idContacto);
+            $("#txtNombre").val(modelo.nombre);
+            $("#txtTelefono").val(modelo.telefono);
+            $("#txtFechaNacimiento").val(modelo.fechaNacimiento);
+
+            $("#exampleModal").modal('show');
+        }
+
+        $("#btnNew").click(() => {
+            seeModal(Modelo_base);
+        });
+
+        $("#btnSave").click(async () => {
+            let newModel = {
+                idContacto: $("#txtIdContacto").val(),
+                nombre: $("#txtNombre").val(),
+                telefono: $("#txtTelefono").val(),
+                fechaNacimiento: $("#txtFechaNacimiento").val()
+            };
+
+            await saveModel(newModel);
+        });
+
+        async function saveModel(newModel) {
+            if ($("#txtIdContacto").val() === "0") {
+                // es uno nuevo
+                try {
+                    const resp = await fetch('/home/save', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(newModel)
+                    });
+
+                    if (resp.ok) {
+                        const dataJson = await resp.json();
+                        if (dataJson.valor) {
+                            alert("Registrado");
+                            $("#exampleModal").modal('hide');
+                        }
+                    } else {
+                        console.error('Error en la petición fetch:', resp.statusText);
+                    }
+                } catch (error) {
+                    console.error('Error en la petición fetch:', error);
+                }
+            } else {
+                // está editando
+                console.log("editar");
+            }
+        }
+
+
+    </script>
+}
