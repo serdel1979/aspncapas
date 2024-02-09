@@ -51,7 +51,7 @@
                 </div>
                 <div class="mb-2">
                     <label>Fecha de Nac.</label>
-                    <input type="text" class="form-control" id="txtFechaNacimiento" />
+                    <input type="date" class="form-control" id="txtFechaNacimiento" />
                 </div>
             </div>
             <div class="modal-footer">
@@ -78,7 +78,10 @@
             $("#txtIdContacto").val(modelo.idContacto);
             $("#txtNombre").val(modelo.nombre);
             $("#txtTelefono").val(modelo.telefono);
-            $("#txtFechaNacimiento").val(modelo.fechaNacimiento);
+
+            // Formatear la fecha como "yyyy-MM-dd"
+            const fechaFormateada = obtenerFechaFormateada(modelo.fechaNacimiento);
+            $("#txtFechaNacimiento").val(fechaFormateada);
 
             $("#exampleModal").modal('show');
         }
@@ -112,12 +115,15 @@
 
                     if (resp.ok) {
                         const dataJson = await resp.json();
+                        await getContacts()
                         if (dataJson.valor) {
                             alert("Registrado");
                             $("#exampleModal").modal('hide');
                         }
                     } else {
-                        console.error('Error en la petición fetch:', resp.statusText);
+                       // console.error('Error en la petición fetch:', resp.statusText);
+                        $("#exampleModal").modal('hide');
+                        alert("Error");   
                     }
                 } catch (error) {
                     console.error('Error en la petición fetch:', error);
@@ -128,6 +134,36 @@
             }
         }
 
+
+        async function getContacts() {
+
+            const resp = await fetch('/home/list', {
+                        method: 'GET',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+             });
+
+            if (resp.ok) {
+                const dataJson = await resp.json();
+                console.log(dataJson);
+            
+            } else {
+                console.log("err");
+            }
+
+        }
+
+
+
+        // Función para obtener la fecha formateada como "yyyy-MM-dd"
+        function obtenerFechaFormateada(fecha) {
+            const fechaObj = new Date(fecha);
+            const anio = fechaObj.getFullYear();
+            const mes = ('0' + (fechaObj.getMonth() + 1)).slice(-2);
+            const dia = ('0' + fechaObj.getDate()).slice(-2);
+            return anio + '-' + mes + '-' + dia;
+        }
 
     </script>
 }
